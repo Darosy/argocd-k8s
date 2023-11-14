@@ -1,0 +1,79 @@
+---
+## Deployment ###
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-service
+  labels:
+    app: sample-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sample-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: sample-service
+      # annotations:
+      #   vault.hashicorp.com/agent-inject: "true"
+      #   vault.hashicorp.com/agent-inject-status: "update"
+      #   vault.hashicorp.com/agent-inject-secret-config: "secret/data/devwebapp/config"
+      #   vault.hashicorp.com/agent-inject-template-config: |
+      #     {{- with secret "secret/data/devwebapp/config" -}}
+      #       export SECRET_USERNAME="{{ .Data.data.username }}"
+      #       export SECRET_PASSWORD="{{ .Data.data.password }}"
+      #     {{- end }}
+      #   vault.hashicorp.com/role: "devweb-app"
+    spec:
+      serviceAccountName: internal-app
+      shareProcessNamespace: true
+      containers:
+        - name: sample-service
+          image: derossy/graalvm-ce:ol8-java17-mvn-22.3.3
+          # command: ["/bin/bash", "-c"]
+          # args:
+          #   ['source /vault/secrets/config && java -jar /app/sample-service-0.0.1-SNAPSHOT.jar']
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: TZ
+              value: Asia/Jakarta
+          # livenessProbe:
+          #   httpGet:
+          #     path: /actuator/health/liveness
+          #     port: 8080
+          #   initialDelaySeconds: 90
+          #   timeoutSeconds: 30
+          #   periodSeconds: 10
+          #   successThreshold: 1
+          #   failureThreshold: 3
+          # readinessProbe:
+          #   httpGet:
+          #     path: /actuator/health/readiness
+          #     port: 8080
+          #   initialDelaySeconds: 90
+          #   timeoutSeconds: 30
+          #   periodSeconds: 10
+          #   successThreshold: 1
+          #   failureThreshold: 3
+          resources:
+            limits:
+              memory: "250Mi"
+              cpu: "250m"
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+
+---
+### Deploy Name Space ###
