@@ -5,6 +5,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sample-service
+  namespace: 
   labels:
     app: sample-service
 spec:
@@ -74,6 +75,3 @@ spec:
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-
----
-### Deploy Name Space ###
