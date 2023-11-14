@@ -33,8 +33,8 @@ spec:
       #     {{- end }}
       #   vault.hashicorp.com/role: "devweb-app"
     spec:
-      serviceAccountName: internal-app
-      shareProcessNamespace: true
+      # serviceAccountName: internal-app
+      # shareProcessNamespace: true
       containers:
         - name: sample-service
           image: derossy/graalvm-ce:ol8-java17-mvn-22.3.3
